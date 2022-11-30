@@ -16,12 +16,12 @@ public:
         this->radius = radius;
         this->color = color;
         this->vel.y = rand()%2-0.5f;
-        this->vel.x = (rand()%2-0.5f)*k;
+        this->vel.x = -0.5*k;
     }
     void velocity(){
-        if(IsKeyPressed(KEY_SPACE)) {vel = temp; temp = {0, 0};}
+        if(IsKeyPressed(KEY_SPACE)) {vel = temp; temp = {0, 0}; stop = false;}
         center.x += vel.x; center.y += vel.y;
-        if(vel.x>0 && center.x<=50) {temp = vel; vel = {0, 0};}
+        if(vel.x>0 && center.x<=50) {temp = vel; vel = {0, 0}; stop= true;}
     }
     void bounce(Rectangle rec, int k){
         vel.x = -(vel.x);
@@ -39,10 +39,9 @@ public:
 };
 int main(void)
 {
-    const int screenWidth = 800;
-    const int screenHeight = 900;
+    const int screenWidth = 800, screenHeight = 900;
     srand(time(0));
-    int steps=5; float shift = (float)screenHeight/steps;
+    int steps=5; float shift = (float)screenHeight/steps; char* winnertext = NULL;
     InitWindow(screenWidth, screenHeight, "Turn Based Pong");
     //Gameobjects
     Ball *ball = new Ball( {(float)screenWidth/2, (float)(rand()%screenHeight)}, 15.0, BLACK, 20);
@@ -53,9 +52,11 @@ int main(void)
     while (!WindowShouldClose()){
         //Rules
         ball->velocity();
+        if(ball->stop){
         if (IsKeyPressed(KEY_UP) && player.y-shift>0) player.y -= shift;
-        if (IsKeyPressed(KEY_DOWN) && player.y+shift<screenHeight) player.y += shift;
-       // if(IsKeyPressed(KEY_SPACE)) ball->resume();
+        if (IsKeyPressed(KEY_DOWN) && player.y+shift<screenHeight) player.y += shift;}
+        if(ball->center.x>screenHeight) winnertext = "Opponent wins by default";
+        else if(ball->center.x<0) winnertext = "You win by default";
         if(ball->center.y>opponent.y+opponent.height && opponent.y+shift<screenHeight) opponent.y +=shift;
         if(ball->center.y<opponent.y && opponent.y-shift>0) opponent.y -=shift;
         if(ball->center.y<=ball->radius) ball->bounceY();
@@ -64,7 +65,9 @@ int main(void)
         //Background
         for(int i=0; i<steps; i++) {DrawRectangle(screenWidth -20.0f,i*screenHeight/steps+10, 10, screenHeight/steps-20, LIGHTGRAY);
         DrawRectangle(20.0f,i*screenHeight/steps+10, 10, screenHeight/steps-20, LIGHTGRAY);} 
-        DrawText("Stage 1", screenWidth/2-50, screenHeight/4, 40, LIGHTGRAY);//Background
+        if(winnertext) DrawText(winnertext, (screenWidth-MeasureText(winnertext,40))/2, screenHeight/2, 40, LIGHTGRAY);
+        else DrawText("Stage 1", (screenWidth-MeasureText("Stage 1",40))/2, screenHeight/2, 40, LIGHTGRAY);
+        //Background
         //Gameobjects Drawings
         DrawRectangleRec(player,MAROON);
         DrawRectangleRec(opponent,MAROON);
