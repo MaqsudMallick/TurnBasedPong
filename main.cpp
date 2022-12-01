@@ -1,10 +1,12 @@
 #include <bits/stdc++.h>
+using namespace std;
 #include "include/raylib.h" 
 const int screenWidth = 800, screenHeight = 900;
 int steps=5;
 const char* winnertext = NULL;
 int sceneno = 1;
 int frames = 0;
+int score = 0;
 const int fontsize = 40; 
 #include "prefabs.h"
 #include "scenes.h"
@@ -26,7 +28,8 @@ int main(void)
     Rectangle opponent; opponent.x = (float)20.0f; opponent.y = 10.0f; opponent.width = 9.0f; opponent.height = (float)screenHeight/steps-20.0f;
     Rec *pl = new Rec(player);
     Rec *op = new Rec(opponent);
-    
+    Texture2D updown = LoadTexture("Textures/updown.png");
+    Texture2D space = LoadTexture("Textures/space.png");
     
     //Frames
     SetTargetFPS(60);  
@@ -37,7 +40,7 @@ int main(void)
             case 1:  Menu(&y, &c, ball); break;
             case 2: chooseDifficulty(&lvl,pl,op); break;
             case 3:  Game(ball, pl, op); break;
-            default:  break;
+            default:  HowtoPlay(updown, space); break;
         }
     }
     CloseWindow();

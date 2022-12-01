@@ -1,5 +1,6 @@
 
-//#include <windows.h>
+#include <string>
+#include <cstring>
 void init(Ball*);
 void Game(Ball* ball, Rec* player, Rec* opponent)
 {
@@ -9,20 +10,20 @@ void Game(Ball* ball, Rec* player, Rec* opponent)
         if(ball->stop){
         if (IsKeyPressed(KEY_UP) && player->rec.y-shift>0) player->rec.y -= shift;
         if (IsKeyPressed(KEY_DOWN) && player->rec.y+shift<screenHeight) player->rec.y += shift;}
-        if(ball->center.x>screenHeight) { winnertext = "Opponent wins by default"; }
-        else if(ball->center.x<0) winnertext = "You win by default";
+        if(ball->center.x>screenHeight) { winnertext = "Opponent wins"; }
+        else if(ball->center.x<0) winnertext = "You win";
         if(ball->center.y>opponent->rec.y+opponent->rec.height && opponent->rec.y+shift<screenHeight) opponent->rec.y +=shift;
         if(ball->center.y<opponent->rec.y && opponent->rec.y-shift>0) opponent->rec.y -=shift;
         if(ball->center.y<=ball->radius) ball->bounceY();
         if(ball->center.y>=screenHeight-ball->radius) ball->bounceY();
-        if(frames>100) {sceneno-=2; frames = 0; steps = 5; }
+        if(frames>100) {sceneno-=2; frames = 0; steps = 5; score= 0; }
         BeginDrawing(); ClearBackground(RAYWHITE);
         //Background
         for(int i=0; i<steps; i++) {DrawRectangle(screenWidth -20.0f,i*screenHeight/steps+10, 10, screenHeight/steps-20, LIGHTGRAY);
         DrawRectangle(20.0f,i*screenHeight/steps+10, 10, screenHeight/steps-20, LIGHTGRAY);} 
         if(winnertext) { DrawText(winnertext, (screenWidth-MeasureText(winnertext,40))/2, screenHeight/2, 40, LIGHTGRAY);
         frames++; }
-        else DrawText("Stage 1", (screenWidth-MeasureText("Stage 1",40))/2, screenHeight/2, 40, LIGHTGRAY);
+        else DrawText(to_string(score).c_str(), (screenWidth-MeasureText("1",fontsize*2))/2, screenHeight/2, fontsize*2, LIGHTGRAY);
         //Background
         //Gameobjects Drawings
         DrawRectangleRec(player->rec,MAROON);
@@ -31,14 +32,14 @@ void Game(Ball* ball, Rec* player, Rec* opponent)
         DrawLineEx(ball->center, {ball->center.x + 50*ball->temp.x, ball->center.y + 50*ball->temp.y}, 2.0f,YELLOW);
         EndDrawing();
         //Collisions
-        if(CheckCollisionCircleRec(ball->center, ball->radius, player->rec)) ball->bounce(player->rec, -1);
+        if(CheckCollisionCircleRec(ball->center, ball->radius, player->rec)) {ball->bounce(player->rec, -1); score++;}
         if(CheckCollisionCircleRec(ball->center, ball->radius, opponent->rec) && !ball->stop) {ball->bounce(opponent->rec, 1);}
 }
 
 void Menu(int* y, int* c, Ball* ball){
     if(IsKeyPressed(KEY_DOWN) && *c!=2) { *y+= screenHeight/5; (*c)++;}
      if(IsKeyPressed(KEY_UP) && *c!=1) {*y-= screenHeight/5; (*c)--;}
-     if(IsKeyPressed(KEY_ENTER)) { sceneno+= *c; init(ball);}
+     if(IsKeyPressed(KEY_ENTER)) { sceneno+= *c==1?*c:4; init(ball);}
       BeginDrawing();
       ClearBackground(RAYWHITE);
       DrawCircle((screenWidth-MeasureText("Start Game", fontsize))/2-30.0f, *y, ball->radius, ball->color);
@@ -76,5 +77,24 @@ void chooseDifficulty(int* lvl, Rec* pl, Rec* op){
         }
         else {DrawRectangleRec({screenWidth/2- 50.0f, 3.5*screenHeight/5, 100.0f, 100.0f}, BLACK);
         DrawText("OK", screenWidth/2- 25.0f, 3.75*screenHeight/5, fontsize, WHITE);}
+        EndDrawing();
+}
+
+void HowtoPlay(Texture2D updown, Texture space){
+        if(IsKeyPressed(KEY_ENTER) || (inside(screenWidth/2- 50.0f, screenWidth/2+ 150.0f, 3.5*screenHeight/5, 3.5*screenHeight/5+100.0f) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))) sceneno=1;
+        BeginDrawing(); ClearBackground(RAYWHITE);
+        DrawTexture(updown, updown.width, 2*screenHeight/5 - updown.height/2, WHITE);
+        DrawText("Use up/down keys to move paddle when your \nturn/screen freezed",  3*updown.width, 2*screenHeight/5 - updown.height/2, fontsize/2, LIGHTGRAY);
+        DrawTexture(space, updown.width, 2.5*screenHeight/5 - space.height/2, WHITE);
+        DrawText("Use space to unfreeze/confirm choice", 2*updown.width + space.width, 2.5*screenHeight/5 - space.height/2, fontsize/2 ,LIGHTGRAY);
+        if(inside(screenWidth/2- 50.0f, screenWidth/2+ 150.0f, 3.5*screenHeight/5, 3.5*screenHeight/5+100.0f)){
+        DrawRectangleRec({screenWidth/2- 50.0f, 3.5*screenHeight/5, 100.0f, 100.0f}, LIGHTGRAY);
+        DrawText("OK", screenWidth/2- 25.0f, 3.75*screenHeight/5, fontsize, BLACK);
+        }
+        else {DrawRectangleRec({screenWidth/2- 50.0f, 3.5*screenHeight/5, 100.0f, 100.0f}, BLACK);
+        DrawText("OK", screenWidth/2- 25.0f, 3.75*screenHeight/5, fontsize, WHITE);}
+
+
+
         EndDrawing();
 }
