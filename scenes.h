@@ -2,7 +2,7 @@
 #include <string>
 #include <cstring>
 void init(Ball*);
-void Game(Ball* ball, Rec* player, Rec* opponent)
+void Game(Ball* ball, Rec* player, Rec* opponent, Sound beep, Sound peep)
 {
         //Rules
         float shift = (float)screenHeight/steps;
@@ -10,12 +10,12 @@ void Game(Ball* ball, Rec* player, Rec* opponent)
         if(ball->stop){
         if (IsKeyPressed(KEY_UP) && player->rec.y-shift>0) player->rec.y -= shift;
         if (IsKeyPressed(KEY_DOWN) && player->rec.y+shift<screenHeight) player->rec.y += shift;}
-        if(ball->center.x>screenHeight) { winnertext = "Opponent wins"; }
-        else if(ball->center.x<0) winnertext = "You win";
+        if(ball->center.x>screenHeight) { PlaySound(peep); winnertext = "Opponent wins"; }
+        else if(ball->center.x<0){ winnertext = "You win"; PlaySound(peep); }
         if(ball->center.y>opponent->rec.y+opponent->rec.height && opponent->rec.y+shift<screenHeight) opponent->rec.y +=shift;
         if(ball->center.y<opponent->rec.y && opponent->rec.y-shift>0) opponent->rec.y -=shift;
-        if(ball->center.y<=ball->radius) ball->bounceY();
-        if(ball->center.y>=screenHeight-ball->radius) ball->bounceY();
+        if(ball->center.y<=ball->radius) {ball->bounceY(); PlaySound(beep);}
+        if(ball->center.y>=screenHeight-ball->radius) {ball->bounceY(); PlaySound(beep); }
         if(frames>100) {sceneno-=2; frames = 0; steps = 5; score= 0; }
         BeginDrawing(); ClearBackground(RAYWHITE);
         //Background
@@ -32,14 +32,14 @@ void Game(Ball* ball, Rec* player, Rec* opponent)
         DrawLineEx(ball->center, {ball->center.x + 50*ball->temp.x, ball->center.y + 50*ball->temp.y}, 2.0f,YELLOW);
         EndDrawing();
         //Collisions
-        if(CheckCollisionCircleRec(ball->center, ball->radius, player->rec)) {ball->bounce(player->rec, -1); score++;}
-        if(CheckCollisionCircleRec(ball->center, ball->radius, opponent->rec) && !ball->stop) {ball->bounce(opponent->rec, 1);}
+        if(CheckCollisionCircleRec(ball->center, ball->radius, player->rec)) {ball->bounce(player->rec, -1); score++; PlaySound(beep);}
+        if(CheckCollisionCircleRec(ball->center, ball->radius, opponent->rec) && !ball->stop) {ball->bounce(opponent->rec, 1); PlaySound(beep);}
 }
 
-void Menu(int* y, int* c, Ball* ball){
-    if(IsKeyPressed(KEY_DOWN) && *c!=2) { *y+= screenHeight/5; (*c)++;}
-     if(IsKeyPressed(KEY_UP) && *c!=1) {*y-= screenHeight/5; (*c)--;}
-     if(IsKeyPressed(KEY_ENTER)) { sceneno+= *c==1?*c:4; init(ball);}
+void Menu(int* y, int* c, Ball* ball, Sound beep, Sound peep){
+    if(IsKeyPressed(KEY_DOWN) && *c!=2) { *y+= screenHeight/5; (*c)++; PlaySound(beep);}
+     if(IsKeyPressed(KEY_UP) && *c!=1) {*y-= screenHeight/5; (*c)--; PlaySound(beep);}
+     if(IsKeyPressed(KEY_ENTER)) { sceneno+= *c==1?*c:4; init(ball); PlaySound(peep);}
       BeginDrawing();
       ClearBackground(RAYWHITE);
       DrawCircle((screenWidth-MeasureText("Start Game", fontsize))/2-30.0f, *y, ball->radius, ball->color);
@@ -54,7 +54,7 @@ bool inside(int x1, int x2, int y1, int y2){
         return GetMouseX()>=x1 && GetMouseX()<=x2 && GetMouseY()>=y1 && GetMouseY()<=y2;
 }
 
-void chooseDifficulty(int* lvl, Rec* pl, Rec* op){
+void chooseDifficulty(int* lvl, Rec* pl, Rec* op, Sound peep){
         if( IsMouseButtonDown(MOUSE_BUTTON_LEFT) && inside(screenWidth/2- MeasureText("Difficulty", fontsize)/2,screenWidth/2+MeasureText("Difficulty", fontsize)/2, 3*screenHeight/5-15,3*screenHeight/5+15))
                 {
                         *lvl = GetMouseX();
@@ -68,7 +68,7 @@ void chooseDifficulty(int* lvl, Rec* pl, Rec* op){
         printf("Steps value = %d", steps);
         pl->rec = {(float)screenWidth -20.0f, 10.0f, 9.0f, (float)screenHeight/steps-20.0f}; 
         op->rec = {(float)20.0f, 10.0f, 9.0f, (float)screenHeight/steps-20.0f};
-        
+        PlaySound(peep);
         }
         //Button Implementation
         if(inside(screenWidth/2- 50.0f, screenWidth/2+ 150.0f, 3.5*screenHeight/5, 3.5*screenHeight/5+100.0f)){

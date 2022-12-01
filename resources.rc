@@ -1,0 +1,27 @@
+GLFW_ICON ICON "circle.ico"
+
+1 VERSIONINFO
+FILEVERSION     0,0,0,1
+PRODUCTVERSION  0,0,0,1
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+	//BLOCK "080904E4" 	// English UK
+    BLOCK "040904E4"	// English US
+    BEGIN
+	  //VALUE "CompanyName", "raylib technologies"
+      VALUE "FileDescription", "A turn based Pong game"
+      VALUE "FileVersion", "0.0.1"
+      VALUE "InternalName", "Pong"
+      VALUE "LegalCopyright", "(c) 2022 Maqsud Mallick"
+      VALUE "OriginalFilename", "TurnPong.exe"
+      VALUE "ProductName", "TurnPong"
+      VALUE "ProductVersion", "0.0.1" 
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+	//VALUE "Translation", 0x809, 1252	// English UK
+    VALUE "Translation", 0x409, 1252	// English US
+  END
+END

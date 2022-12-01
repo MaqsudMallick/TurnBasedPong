@@ -22,6 +22,7 @@ int main(void)
     int y = 2*screenHeight/5 + 15.0f, c=1;
     int lvl = screenWidth/2 - MeasureText("Difficulty", fontsize)/2 -100;
     InitWindow(screenWidth, screenHeight, "Turn Based Pong");
+    InitAudioDevice();
     //Gameobjects
     Ball *ball = new Ball( {(float)screenWidth/2, (float)(rand()%screenHeight)}, 15.0, BLACK, 20);
     Rectangle player; player.x = (float)screenWidth -20.0f; player.y = 10.0f; player.width = 9.0f; player.height = (float)screenHeight/steps-20.0f;
@@ -30,19 +31,28 @@ int main(void)
     Rec *op = new Rec(opponent);
     Texture2D updown = LoadTexture("Textures/updown.png");
     Texture2D space = LoadTexture("Textures/space.png");
-    
+    Music music = LoadMusicStream("audio/tutorialmusic.mp3");
+    Sound beep = LoadSound("audio/Pop.ogg");
+    Sound peep2 = LoadSound("audio/plop2.ogg");
+    Sound peep = LoadSound("audio/plop.ogg");
+    //Sound plop = LoadSound("audio/Score.ogg");
+    PlayMusicStream(music);
     //Frames
     SetTargetFPS(60);  
     while (!WindowShouldClose()){
         // Game(ball, pl, op, steps);
-        
+        UpdateMusicStream(music);
         switch(sceneno){
-            case 1:  Menu(&y, &c, ball); break;
-            case 2: chooseDifficulty(&lvl,pl,op); break;
-            case 3:  Game(ball, pl, op); break;
+            case 1:  Menu(&y, &c, ball, beep, peep); break;
+            case 2: chooseDifficulty(&lvl,pl,op, peep); break;
+            case 3:  Game(ball, pl, op, beep, peep2); break;
             default:  HowtoPlay(updown, space); break;
         }
     }
+    UnloadMusicStream(music);
+    UnloadSound(beep);
+    UnloadSound(peep2);
+    UnloadSound(peep);
     CloseWindow();
     return 0;
 }
