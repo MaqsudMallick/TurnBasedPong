@@ -8,8 +8,8 @@ int sceneno = 1;
 int frames = 0;
 int score = 0;
 const int fontsize = 40; 
-#include "prefabs.h"
-#include "scenes.h"
+#include "include/prefabs.h"
+#include "include/scenes.h"
 void init(Ball* ball){
     ball->init( {(float)screenWidth/2, (float)(rand()%screenHeight)}, 15.0, BLACK, 20);
     frames = 0;
